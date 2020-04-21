@@ -15,3 +15,25 @@ variables:
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+  workingDirectory: 'pipelines-dotnet-core'
+
+- script: dotnet publish --configuration $(buildConfiguration) --output publish
+  name: runDotnetPublish
+  displayName: 'dotnet publish $(buildConfiguration)'
+  workingDirectory: 'pipelines-dotnet-core'
+
+- task: ArchiveFiles@2
+  displayName: 'Create Archive: pipelines-dotnet-core/publish/application.zip'
+  inputs:
+    rootFolderOrFile: 'pipelines-dotnet-core/publish/' 
+    includeRootFolder: false 
+    archiveType: 'zip'
+    archiveFile: 'pipelines-dotnet-core/publish/application.zip' 
+    replaceExistingArchive: true
+
+- task: PublishPipelineArtifact@0
+  displayName: 'Publish pipeline artifact - application.zip'
+  inputs:
+    artifactName: 'application'
+    targetPath: 'pipelines-dotnet-core/publish/application.zip'
+    
